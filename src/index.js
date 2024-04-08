@@ -17,7 +17,7 @@ class AppController {
 
     routes(){
         const routes = require ('../src/routes/routes')
-        this.express.use('/', routes);
+        this.express.use('/api/v1', routes);
         this.express.get('/health/', (_, res) =>{
             res.send({ message: 'teste'});
         });
