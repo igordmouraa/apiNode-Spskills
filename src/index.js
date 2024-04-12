@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require('cors');
-const db = require('../src/database/conn')
+const testConnect = require('./database/testConnect')
 
 class AppController {
     constructor (){
@@ -21,15 +21,8 @@ class AppController {
         this.express.get('/health/', (_, res) =>{
             res.send({ message: 'teste'});
         });
-        this.express.get('/teste/', (_, res) =>{
-            try{
-                db.query(
-                    'SELECT * FROM user'
-                );
-
-            }catch(error){
-                res.status(500).json({ error: 'erro ao registrar rota'})
-            }
+        this.express.get('/testConnect/', (_, res) =>{
+            testConnect(res);
         });
     }
 }

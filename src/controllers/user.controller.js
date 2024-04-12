@@ -7,6 +7,7 @@ class userController {
 
     static async createUser(req, res) {
         const { name, email, username, password } = req.body;
+        // const passwordHashed = bcrypt.hash(password, 10);
         const errors = {};
 
         try {
@@ -50,7 +51,7 @@ class userController {
                     return res.status(422).json({ message: 'Invalid properties', errors });
                 }
             }
-            
+
 
             await db.query(
                 'INSERT INTO user (email, password, name, username) VALUES (?, ?, ?, ?)',
@@ -101,26 +102,32 @@ class userController {
 
         try {
             // Consulta o banco de dados
-            const user = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+            const [users] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
 
-            // Verifica se o usuário existe
-            if (!user || !user.length) {
-                return res.status(422).json({ message: 'Invalid email or password' });
+            if (users.length === 0) {
+                return res.status(401).json({ error: 'User not found' });
             }
 
-            const match = password === password;
+            const user = users[0];
+            // const passwordHashed = user.password;
 
-            if (!match) {
-                return res.status(422).json({ message: 'Invalid email or password' });
+            // const passwordMatch = await bcrypt.compare(password, passwordHashed);
+
+            // if (!passwordMatch) {
+            //     return res.status(401).json({ error: 'Incorrect password' });
+            // }
+
+            if(user.password !== password){
+                return res.status(400).json({ message: 'password incorrect'})
             }
 
             // Gera token JWT
             const token = jwt.sign({ email }, secretKey);
 
-            return res.status(200).json({ token });
+            return res.status(200).json({ message: 'Logged in successfully', token });
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ error: 'Error ao logar' });
+            return res.status(500).json({ error: 'Error while logging in' });
         }
     }
 }
